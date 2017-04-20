@@ -44,8 +44,9 @@ public class BasicActivity extends ListActivity {
         switch(requestCode) {
             case (0) : {
                 if (resultCode == Activity.RESULT_OK) {
-                    String newText = data.getStringExtra("desc");
-                    listItems.add(newText);
+                    String desc = data.getStringExtra("desc");
+                    String email = data.getStringExtra("email");
+                    listItems.add(desc + " \n" + email);
                     adapter.notifyDataSetChanged();
                 }
                 break;
