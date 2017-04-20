@@ -2,4 +2,8 @@
     <string name="app_name">TDL</string>
     <string name="action_settings">Settings</string>
     <string name="add_new_item">Add New Item</string>
+    <string name="feedbacktitle">Item information:</string>
+    <string name="description">description </string>
+    <string name="feedbackemail">mail</string>
+    <string name="feedbackbutton">Save Item</string>
 </resources>
