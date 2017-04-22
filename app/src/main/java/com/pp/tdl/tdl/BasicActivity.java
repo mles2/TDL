@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import static java.lang.Thread.sleep;
+
 public class BasicActivity extends ListActivity {
 
     public static int result = 0;
@@ -59,7 +61,14 @@ public class BasicActivity extends ListActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
+                try{
                 Log.w("OnClickListener","Position: " + position);
+                listItems.remove(position);
+                saveDataToFile(listItems);
+                adapter.notifyDataSetChanged();}
+                catch(Exception e){
+                    Log.w("BasicActivity", "Bad removal or saving problem");
+                }
             }
         });
         adapter.notifyDataSetChanged();
@@ -201,10 +210,20 @@ public class BasicActivity extends ListActivity {
 
     public void pushToServer(View view) {
         new PushTask().execute("");
+
     }
 
     public void pullFromServer(View view) {
         new PullTask().execute("");
+        try {
+            Thread.sleep(100);
+            updateScreen(loadFromFile());
+        } catch (Exception e) {
+            Log.d("Puller", "Interrupted waiting operation, data may be not synchronised!");
+            e.printStackTrace();
+        }
+
+
     }
 
     private class PushTask extends AsyncTask<String, String, TcpClient> {
@@ -229,6 +248,13 @@ public class BasicActivity extends ListActivity {
         }
     }
 
+    void updateScreen(ArrayList<String> list)
+    {
+        listItems.clear();
+        listItems.addAll(list);
+        adapter.notifyDataSetChanged();
+    }
+
     private class PullTask extends AsyncTask<String, String, TcpClient> {
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
@@ -239,12 +265,11 @@ public class BasicActivity extends ListActivity {
             String xmlString = serverConnectionClient.receiveXml();
             Log.w("PullTask", "Received xml\n" + xmlString);
             try {
-                listItems = convertXmlStringToList(xmlString);
-                saveDataToFile(listItems);
+                ArrayList<String> listOfItems = convertXmlStringToList(xmlString);
+                saveDataToFile(listOfItems);
             }catch(Exception e) {
                 Log.w("PullTask","Problem with parsing received Xml");
-            }
-
+        }
             return serverConnectionClient;
         }
 
