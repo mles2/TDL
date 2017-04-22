@@ -2,6 +2,7 @@ package com.pp.tdl.tdl;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Xml;
@@ -31,6 +32,7 @@ public class BasicActivity extends ListActivity {
 
     public static int result = 0;
     ArrayList<String> listItems=new ArrayList<>();
+    TcpClient serverConnectionClient;
     ArrayAdapter<String> adapter;
 
     @Override
@@ -138,7 +140,7 @@ public class BasicActivity extends ListActivity {
 
         NodeList items = dom.getElementsByTagName("record");
 
-        ArrayList<String> arr = new ArrayList<String>();
+        ArrayList<String> arr = new ArrayList<>();
 
         for (int i=0;i<items.getLength();i++){
 
@@ -148,5 +150,38 @@ public class BasicActivity extends ListActivity {
 
         }
         return arr;
+    }
+
+    public void syncWithServer(View view) {
+        new ConnectTask().execute("");
+    }
+
+    private class ConnectTask extends AsyncTask<String, String, TcpClient> {
+
+        @Override
+        protected TcpClient doInBackground(String... message) {
+
+            //we create a TCPClient object
+            serverConnectionClient = new TcpClient(new TcpClient.OnMessageReceived() {
+                @Override
+                //here the messageReceived method is implemented
+                public void messageReceived(String message) {
+                    //this method calls the onProgressUpdate
+                    publishProgress(message);
+                }
+            });
+            serverConnectionClient.run();
+
+            return serverConnectionClient;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            //response received from server
+            Log.d("test", "response " + values[0]);
+            //process server response here....
+
+        }
     }
 }

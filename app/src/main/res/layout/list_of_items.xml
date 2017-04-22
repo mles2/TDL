@@ -10,6 +10,12 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:onClick="addItems"/>
+    <Button
+        android:id="@+id/syncBtn"
+        android:text="@string/sync_with_server"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="syncWithServer"/>
     <ListView
         android:id="@android:id/list"
         android:layout_width="fill_parent"
