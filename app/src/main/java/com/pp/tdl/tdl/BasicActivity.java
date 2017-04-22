@@ -46,7 +46,8 @@ public class BasicActivity extends ListActivity {
                 if (resultCode == Activity.RESULT_OK) {
                     String desc = data.getStringExtra("desc");
                     String email = data.getStringExtra("email");
-                    listItems.add(desc + " \n" + email);
+                    String date = data.getStringExtra("date");
+                    listItems.add(desc + " \n" + email + " \n" + date);
                     adapter.notifyDataSetChanged();
                 }
                 break;

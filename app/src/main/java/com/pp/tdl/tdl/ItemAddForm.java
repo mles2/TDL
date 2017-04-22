@@ -16,7 +16,8 @@ import android.widget.EditText;
  * Platformy programistyczne
  */
 
-public class ItemAddForm extends AppCompatActivity {
+public class ItemAddForm extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+    String date = "";
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.item_add_form);
@@ -37,8 +38,13 @@ public class ItemAddForm extends AppCompatActivity {
 
         resultIntent.putExtra("desc", desc);
         resultIntent.putExtra("email", email);
+        resultIntent.putExtra("date", date);
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
     }
 
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        date = String.format("%d - %d - %d",dayOfMonth, month+1, year);
+    }
 }
