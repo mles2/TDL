@@ -57,7 +57,7 @@ class TcpClient {
 
                 //creating in to get data from server
                 BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
+                outToServer.writeBytes("push" + "\n");
                 String content = new Scanner(new File(filename)).useDelimiter("\\Z").next();
                 content += "\nq";
                 outToServer.writeBytes(content + '\n');
@@ -81,5 +81,50 @@ class TcpClient {
 
         }
 
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public String receiveXml() {
+        try {
+            //here you must put your computer's IP address.
+            InetAddress serverAddr = InetAddress.getByName(SERVER_IP);
+
+            Log.e("TCP Client", "C: Connecting...");
+
+            //create a socket to make the connection with the server
+
+            try (Socket socket = new Socket(serverAddr, SERVER_PORT)) {
+                String message;
+                String responseFromServer;
+
+                //trying to connect
+
+                //creating out to write to server
+                DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
+                outToServer.writeBytes("pull" + "\n");
+                //creating in to get data from server
+                BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+                String content = new Scanner(inFromServer).useDelimiter("\\Z").next();
+                Log.w("ReceiveXml", "Received " + content);
+                content += "\nq";
+                socket.close();
+
+            } catch (Exception e) {
+
+                Log.e("TCP", "S: Error", e);
+
+            }
+            //the socket must be closed. It is not possible to reconnect to this socket
+            // after it is closed, which means a new socket instance has to be created.
+
+
+        } catch (Exception e) {
+
+            Log.e("TCP", "C: Error", e);
+
+        }
+
+        return null;
     }
 }

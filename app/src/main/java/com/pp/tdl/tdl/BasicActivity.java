@@ -155,14 +155,18 @@ public class BasicActivity extends ListActivity {
     }
 
     public void syncWithServer(View view) {
-        new ConnectTask().execute("");
+        new PushTask().execute("");
     }
 
     public void pushToServer(View view) {
-        new ConnectTask().execute("");
+        new PushTask().execute("");
     }
 
-    private class ConnectTask extends AsyncTask<String, String, TcpClient> {
+    public void pullFromServer(View view) {
+        new PullTask().execute("");
+    }
+
+    private class PushTask extends AsyncTask<String, String, TcpClient> {
         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         protected TcpClient doInBackground(String... message) {
@@ -170,6 +174,28 @@ public class BasicActivity extends ListActivity {
             //we create a TCPClient object
             serverConnectionClient = new TcpClient(getFilesDir() +"/saved_list.xml");
             serverConnectionClient.sendXml();
+
+            return serverConnectionClient;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            //response received from server
+            Log.d("test", "response " + values[0]);
+            //process server response here....
+
+        }
+    }
+
+    private class PullTask extends AsyncTask<String, String, TcpClient> {
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+        @Override
+        protected TcpClient doInBackground(String... message) {
+
+            //we create a TCPClient object
+            serverConnectionClient = new TcpClient(getFilesDir() +"/saved_list.xml");
+            String xml = serverConnectionClient.receiveXml();
 
             return serverConnectionClient;
         }
