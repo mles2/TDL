@@ -7,4 +7,6 @@
     <string name="feedbackemail">name</string>
     <string name="feedbackbutton">Save Item</string>
     <string name="sync_with_server">SYNC WITH SERVER</string>
+    <string name="pull_from_server">PULL FROM SERVER</string>
+    <string name="push_to_server">PUSH TO SERVER</string>
 </resources>

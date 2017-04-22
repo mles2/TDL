@@ -1,5 +1,7 @@
 package com.pp.tdl.tdl;
 
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -22,20 +24,18 @@ class TcpClient {
 
     private static final String SERVER_IP = "192.168.8.104"; //server IP address
     private static final int SERVER_PORT = 1234;
-    // sends message received notifications
-    private OnMessageReceived mMessageListener;
     private String filename;
 
     /**
      * Constructor of the class. OnMessagedReceived listens for the messages received from server
      */
-    TcpClient(OnMessageReceived listener, String p_filename) {
-        mMessageListener = listener;
+    TcpClient(String p_filename) {
         filename = p_filename;
     }
 
 
-    void run() {
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    void sendXml() {
 
 
         try {
@@ -82,11 +82,4 @@ class TcpClient {
         }
 
     }
-
-    //Declare the interface. The method messageReceived(String message) will must be implemented in the MyActivity
-    //class at on asynckTask doInBackground
-    interface OnMessageReceived {
-        void messageReceived(String message);
-    }
-
 }

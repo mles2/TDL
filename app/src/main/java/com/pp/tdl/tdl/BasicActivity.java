@@ -3,7 +3,9 @@ package com.pp.tdl.tdl;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.util.Xml;
 import android.view.View;
@@ -156,21 +158,18 @@ public class BasicActivity extends ListActivity {
         new ConnectTask().execute("");
     }
 
-    private class ConnectTask extends AsyncTask<String, String, TcpClient> {
+    public void pushToServer(View view) {
+        new ConnectTask().execute("");
+    }
 
+    private class ConnectTask extends AsyncTask<String, String, TcpClient> {
+        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
         @Override
         protected TcpClient doInBackground(String... message) {
 
             //we create a TCPClient object
-            serverConnectionClient = new TcpClient(new TcpClient.OnMessageReceived() {
-                @Override
-                //here the messageReceived method is implemented
-                public void messageReceived(String message) {
-                    //this method calls the onProgressUpdate
-                    publishProgress(message);
-                }
-            }, getFilesDir() +"/saved_list.xml");
-            serverConnectionClient.run();
+            serverConnectionClient = new TcpClient(getFilesDir() +"/saved_list.xml");
+            serverConnectionClient.sendXml();
 
             return serverConnectionClient;
         }

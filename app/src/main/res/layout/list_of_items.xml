@@ -11,11 +11,17 @@
         android:layout_height="wrap_content"
         android:onClick="addItems"/>
     <Button
-        android:id="@+id/syncBtn"
-        android:text="@string/sync_with_server"
+        android:id="@+id/pushBtn"
+        android:text="@string/push_to_server"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:onClick="syncWithServer"/>
+        android:onClick="pushToServer"/>
+    <Button
+        android:id="@+id/pullBtn"
+        android:text="@string/pull_from_server"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="pullFromServer"/>
     <ListView
         android:id="@android:id/list"
         android:layout_width="fill_parent"
