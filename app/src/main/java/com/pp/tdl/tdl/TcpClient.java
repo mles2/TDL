@@ -107,8 +107,8 @@ class TcpClient {
 
                 String content = new Scanner(inFromServer).useDelimiter("\\Z").next();
                 Log.w("ReceiveXml", "Received " + content);
-                content += "\nq";
                 socket.close();
+                return content;
 
             } catch (Exception e) {
 

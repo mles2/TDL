@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -82,6 +83,35 @@ public class BasicActivity extends ListActivity {
             }
         }
     }
+
+    ArrayList<String> convertXmlStringToList(String content) throws Exception {
+        InputStream is = new ByteArrayInputStream(content.getBytes());
+        DocumentBuilderFactory dbf;
+        DocumentBuilder db;
+        Document dom;
+
+        dbf = DocumentBuilderFactory.newInstance();
+        db = dbf.newDocumentBuilder();
+        dom = db.parse(is);
+        // normalize the document
+        dom.getDocumentElement().normalize();
+
+        NodeList items = dom.getElementsByTagName("record");
+
+        ArrayList<String> arr = new ArrayList<>();
+
+        for (int i=0;i<items.getLength();i++){
+
+            Node item = items.item(i);
+            String temp = item.getTextContent();
+            arr.add(temp);
+            Log.w("convertXmlToString",temp);
+
+        }
+        return arr;
+
+    }
+
 
     void saveDataToFile(ArrayList<String> listItems) throws IOException{
         String filename = getFilesDir() +"/saved_list.xml";
@@ -195,7 +225,14 @@ public class BasicActivity extends ListActivity {
 
             //we create a TCPClient object
             serverConnectionClient = new TcpClient(getFilesDir() +"/saved_list.xml");
-            String xml = serverConnectionClient.receiveXml();
+            String xmlString = serverConnectionClient.receiveXml();
+            Log.w("PullTask", "Received xml\n" + xmlString);
+            try {
+                listItems = convertXmlStringToList(xmlString);
+                saveDataToFile(listItems);
+            }catch(Exception e) {
+                Log.w("PullTask","Problem with parsing received Xml");
+            }
 
             return serverConnectionClient;
         }
