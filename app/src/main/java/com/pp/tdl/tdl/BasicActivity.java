@@ -169,7 +169,7 @@ public class BasicActivity extends ListActivity {
                     //this method calls the onProgressUpdate
                     publishProgress(message);
                 }
-            });
+            }, getFilesDir() +"/saved_list.xml");
             serverConnectionClient.run();
 
             return serverConnectionClient;

@@ -5,11 +5,13 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Scanner;
 
 /**
  * Created by mles on 2017-04-22.
@@ -21,13 +23,15 @@ class TcpClient {
     private static final String SERVER_IP = "192.168.8.104"; //server IP address
     private static final int SERVER_PORT = 1234;
     // sends message received notifications
-    private OnMessageReceived mMessageListener = null;
+    private OnMessageReceived mMessageListener;
+    private String filename;
 
     /**
      * Constructor of the class. OnMessagedReceived listens for the messages received from server
      */
-    TcpClient(OnMessageReceived listener) {
+    TcpClient(OnMessageReceived listener, String p_filename) {
         mMessageListener = listener;
+        filename = p_filename;
     }
 
 
@@ -54,8 +58,9 @@ class TcpClient {
                 //creating in to get data from server
                 BufferedReader inFromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                message = "JESTEM";
-                outToServer.writeBytes(message + '\n');
+                String content = new Scanner(new File(filename)).useDelimiter("\\Z").next();
+                content += "\nq";
+                outToServer.writeBytes(content + '\n');
                 responseFromServer = inFromServer.readLine();
                 socket.close();
                 //sends the message to the server
