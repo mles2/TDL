@@ -11,7 +11,9 @@ import android.util.Xml;
 import android.view.View;
 
 import android.app.ListActivity;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -26,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,14 +35,17 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public class BasicActivity extends ListActivity {
 
     public static int result = 0;
+    ListView listView;
     ArrayList<String> listItems=new ArrayList<>();
     TcpClient serverConnectionClient;
     ArrayAdapter<String> adapter;
+    String selectedItem;
 
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.list_of_items);
+        listView = (ListView) findViewById(android.R.id.list);
         try {
             listItems = loadFromFile();
             Log.w("FileReader", "File read!");
@@ -52,7 +56,14 @@ public class BasicActivity extends ListActivity {
                 android.R.layout.simple_list_item_1,
                 listItems);
         setListAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                Log.w("OnClickListener","Position: " + position);
+            }
+        });
         adapter.notifyDataSetChanged();
+
     }
 
     //METHOD WHICH WILL HANDLE DYNAMIC INSERTION
