@@ -3,24 +3,21 @@ package com.pp.tdl.tdl;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import android.app.ListActivity;
 import android.widget.ArrayAdapter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class BasicActivity extends ListActivity {
 
     public static int result = 0;
-    //LIST OF ARRAY STRINGS WHICH WILL SERVE AS LIST ITEMS
     ArrayList<String> listItems=new ArrayList<>();
-
-    //DEFINING A STRING ADAPTER WHICH WILL HANDLE THE DATA OF THE LISTVIEW
     ArrayAdapter<String> adapter;
-
-    //RECORDING HOW MANY TIMES THE BUTTON HAS BEEN CLICKED
-    int clickCounter=0;
+    FileSaver fileSaver = new FileSaver();
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -49,9 +46,19 @@ public class BasicActivity extends ListActivity {
                     String date = data.getStringExtra("date");
                     listItems.add(desc + " \n" + email + " \n" + date);
                     adapter.notifyDataSetChanged();
+                    try{
+                        saveToFile();
+                        Log.w("FileSaver","File succesfully created!");
+                    }catch(Exception e) {
+                        Log.w("FileSaver","Problem with saving file!");
+                    }
                 }
                 break;
             }
         }
+    }
+
+    public void saveToFile() throws IOException{
+        fileSaver.saveDataToFile(listItems);
     }
 }
