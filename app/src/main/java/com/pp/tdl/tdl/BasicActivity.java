@@ -39,63 +39,66 @@ import static java.lang.Thread.sleep;
 
 public class BasicActivity extends ListActivity {
 
-    public static int result = 0;
+    public static int result = 0; //TO GATHER STATE FROM DERIVED ACTIVITY
     ListView listView;
-    ArrayList<String> listItems=new ArrayList<>();
-    TcpClient serverConnectionClient;
+    ArrayList<String> listItems = new ArrayList<>();
+    String defaultFilename = "saved_data.xml";
     ArrayAdapter<String> adapter;
-    String selectedItem;
 
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         setContentView(R.layout.list_of_items);
         listView = (ListView) findViewById(android.R.id.list);
+        defaultFilename = getFilesDir() + "/saved_list.xml";
+
+        // TRY TO LOAD LAST CONFIGURATION FROM FILE
         try {
             listItems = loadFromFile();
             Log.w("FileReader", "File read!");
-        }catch(Exception e) {
-            Log.w("FileReader","Problem with reading last configuration from file!");
+        } catch (Exception e) {
+            Log.w("FileReader", "Problem with reading last configuration from file!");
         }
-        adapter=new ArrayAdapter<>(this,
+
+        //INIT OF ARRAY ADAPTER
+        adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1,
                 listItems);
         setListAdapter(adapter);
+
+        //ON CLICK ON LIST ELEMENT
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     final int position, long id) {
-                try{
-
-                Log.w("OnClickListener","Position: " + position);
-                    AlertDialog alertDialog = new AlertDialog.Builder(BasicActivity.this).create();
-                    alertDialog.setTitle("Done");
-                    alertDialog.setMessage("Is it done?");
-
-                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,"YES", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(getApplicationContext(), "Item Removed", Toast.LENGTH_SHORT).show();
-                            listItems.remove(position);
-                            try {
-                                saveDataToFile(listItems);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            adapter.notifyDataSetChanged();
+                Log.w("OnClickListener", "Position: " + position);
+                AlertDialog alertDialog = new AlertDialog.Builder(BasicActivity.this).create();
+                alertDialog.setTitle("Done");
+                alertDialog.setMessage("Is it done?");
+                //BUTTON TO DELETE ITEM
+                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "YES", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(), "Item Removed", Toast.LENGTH_SHORT).show();
+                        listItems.remove(position);
+                        try {
+                            saveDataToFile(listItems);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Log.w("BasicActivity", "Bad removal or saving problem");
                         }
-                    });
-                    alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE,"NO", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(getApplicationContext(), "Item still in progress", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                        adapter.notifyDataSetChanged();
+                    }
+                });
 
 
-                    alertDialog.show();
+                //BUTTON TO LEAVE ITEM
+                alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "NO", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getApplicationContext(), "Item still in progress", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
-                }
-                catch(Exception e){
-                    Log.w("BasicActivity", "Bad removal or saving problem");
-                }
+
+                alertDialog.show();
             }
         });
         adapter.notifyDataSetChanged();
@@ -108,22 +111,23 @@ public class BasicActivity extends ListActivity {
         startActivityForResult(intent, result);
     }
 
+    //METHOD TO HANDLE ROLLBACK FROM ITEM CREATION ACTIVITY
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
-            case (0) : {
+        switch (requestCode) {
+            case (0): {
                 if (resultCode == Activity.RESULT_OK) {
                     String desc = data.getStringExtra("desc");
                     String email = data.getStringExtra("email");
                     String date = data.getStringExtra("date");
                     listItems.add(desc + " \n" + email + " \n" + date);
                     adapter.notifyDataSetChanged();
-                    try{
+                    try {
                         saveDataToFile(listItems);
-                        Log.w("FileSaver","File succesfully created!");
-                    }catch(Exception e) {
-                        Log.w("FileSaver","Problem with saving file!");
+                        Log.w("FileSaver", "File succesfully created!");
+                    } catch (Exception e) {
+                        Log.w("FileSaver", "Problem with saving file!");
                     }
                 }
                 break;
@@ -131,6 +135,7 @@ public class BasicActivity extends ListActivity {
         }
     }
 
+    //METHOD TO ANALYZE XML IN STRING AND CONVERT IT TO ARRAY
     ArrayList<String> convertXmlStringToList(String content) throws Exception {
         InputStream is = new ByteArrayInputStream(content.getBytes());
         DocumentBuilderFactory dbf;
@@ -147,24 +152,23 @@ public class BasicActivity extends ListActivity {
 
         ArrayList<String> arr = new ArrayList<>();
 
-        for (int i=0;i<items.getLength();i++){
+        for (int i = 0; i < items.getLength(); i++) {
 
             Node item = items.item(i);
             String temp = item.getTextContent();
             arr.add(temp);
-            Log.w("convertXmlToString",temp);
+            Log.w("convertXmlToString", temp);
 
         }
         return arr;
 
     }
 
-
-    void saveDataToFile(ArrayList<String> listItems) throws IOException{
-        String filename = getFilesDir() +"/saved_list.xml";
+    //METHOD SAVING ARRAY TO XML FILE
+    void saveDataToFile(ArrayList<String> listItems) throws IOException {
+        String filename = getFilesDir() + "/saved_list.xml";
         Log.w("FileSaver", filename);
         File myFile = new File(filename);
-        myFile.createNewFile();
         FileOutputStream fos = new FileOutputStream(myFile);
 
         XmlSerializer serializer = Xml.newSerializer();
@@ -174,8 +178,7 @@ public class BasicActivity extends ListActivity {
 
         serializer.startTag(null, "root");
 
-        for(int j = 0 ; j < listItems.size() ; j++)
-        {
+        for (int j = 0; j < listItems.size(); j++) {
 
             serializer.startTag(null, "record");
 
@@ -190,10 +193,10 @@ public class BasicActivity extends ListActivity {
         fos.close();
     }
 
+    //METHOD RETURNING DATA FROM XML FILE
     ArrayList<String> loadFromFile() throws Exception {
-        String filename =  getFilesDir() + "/saved_list.xml";
-        Log.w("FileReader", filename);
-        FileInputStream fis = new FileInputStream(filename);
+        Log.w("FileReader", defaultFilename);
+        FileInputStream fis = new FileInputStream(defaultFilename);
         InputStreamReader isr = new InputStreamReader(fis);
 
         char[] inputBuffer = new char[fis.available()];
@@ -221,7 +224,7 @@ public class BasicActivity extends ListActivity {
 
         ArrayList<String> arr = new ArrayList<>();
 
-        for (int i=0;i<items.getLength();i++){
+        for (int i = 0; i < items.getLength(); i++) {
 
             Node item = items.item(i);
 
@@ -259,7 +262,7 @@ public class BasicActivity extends ListActivity {
         protected TcpClient doInBackground(String... message) {
 
             //we create a TCPClient object
-            serverConnectionClient = new TcpClient(getFilesDir() +"/saved_list.xml");
+            TcpClient serverConnectionClient = new TcpClient(defaultFilename);
             serverConnectionClient.sendXml();
 
             return serverConnectionClient;
@@ -275,8 +278,7 @@ public class BasicActivity extends ListActivity {
         }
     }
 
-    void updateScreen(ArrayList<String> list)
-    {
+    void updateScreen(ArrayList<String> list) {
         listItems.clear();
         listItems.addAll(list);
         adapter.notifyDataSetChanged();
@@ -288,15 +290,15 @@ public class BasicActivity extends ListActivity {
         protected TcpClient doInBackground(String... message) {
 
             //we create a TCPClient object
-            serverConnectionClient = new TcpClient(getFilesDir() +"/saved_list.xml");
+            TcpClient serverConnectionClient = new TcpClient(defaultFilename);
             String xmlString = serverConnectionClient.receiveXml();
             Log.w("PullTask", "Received xml\n" + xmlString);
             try {
                 ArrayList<String> listOfItems = convertXmlStringToList(xmlString);
                 saveDataToFile(listOfItems);
-            }catch(Exception e) {
-                Log.w("PullTask","Problem with parsing received Xml");
-        }
+            } catch (Exception e) {
+                Log.w("PullTask", "Problem with parsing received Xml");
+            }
             return serverConnectionClient;
         }
 
