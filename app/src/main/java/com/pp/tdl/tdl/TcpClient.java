@@ -22,7 +22,7 @@ import java.util.Scanner;
 
 class TcpClient {
 
-    private static final String SERVER_IP = "192.168.8.104"; //server IP address
+    private static final String SERVER_IP = "192.168.8.101"; //server IP address
     private static final int SERVER_PORT = 1234;
     private String filename;
 
@@ -84,7 +84,7 @@ class TcpClient {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public String receiveXml() {
+    String receiveXml() {
         try {
             //here you must put your computer's IP address.
             InetAddress serverAddr = InetAddress.getByName(SERVER_IP);

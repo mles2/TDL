@@ -1,6 +1,8 @@
 package com.pp.tdl.tdl;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -14,6 +16,7 @@ import android.app.ListActivity;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -60,12 +63,36 @@ public class BasicActivity extends ListActivity {
         setListAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
+                                    final int position, long id) {
                 try{
+
                 Log.w("OnClickListener","Position: " + position);
-                listItems.remove(position);
-                saveDataToFile(listItems);
-                adapter.notifyDataSetChanged();}
+                    AlertDialog alertDialog = new AlertDialog.Builder(BasicActivity.this).create();
+                    alertDialog.setTitle("Done");
+                    alertDialog.setMessage("Is it done?");
+
+                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE,"YES", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(getApplicationContext(), "Item Removed", Toast.LENGTH_SHORT).show();
+                            listItems.remove(position);
+                            try {
+                                saveDataToFile(listItems);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            adapter.notifyDataSetChanged();
+                        }
+                    });
+                    alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE,"NO", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(getApplicationContext(), "Item still in progress", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
+                    alertDialog.show();
+
+                }
                 catch(Exception e){
                     Log.w("BasicActivity", "Bad removal or saving problem");
                 }
